@@ -1,0 +1,23 @@
+<!doctype html>
+<head>
+    <title>Upload new Photo</title>
+</head>
+<body>
+    <h1>Upload new Image</h1>
+    <form method=post enctype=multipart/form-data>
+        <label for="age">Target age:</label>
+        <input type="text" id="age" name="age" maxlength="3" size="1"> (0-100)
+        <br><br>
+        <label for="background">Background:</label>
+        <select name="background" id="background">
+        {% for b in backgrounds %}
+            <OPTION value={{b.background_id}}>{{b.background_name}}</option>
+        {% endfor %}
+        </select>
+        <br><br>
+        <label for="file">Input image:</label>
+        <input type=file id="file" name=file>
+        <br><br>
+        <input type=submit value=Upload>
+    </form>
+</body>
