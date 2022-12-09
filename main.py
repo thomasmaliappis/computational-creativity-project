@@ -43,7 +43,7 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             age = request.form['age']
             background = request.form['background']
-            return redirect(url_for('uploaded_file', filename=filename, age=age,background=background))
+            return redirect(url_for('uploaded_file', filename=filename, age=age, background=background))
     backgrounds = [
         {'background_name': 'name1', 'background_id': 'id1'},
         {'background_name': 'name2', 'background_id': 'id2'}
