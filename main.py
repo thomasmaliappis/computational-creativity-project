@@ -20,11 +20,9 @@ app.add_url_rule(
     '/uploads/<filename>?background=<background>', 'upload_file_without_age', build_only=True
 )
 app.add_url_rule(
-    '/uploads/<filename>', 'upload_file_without_age_and_background', build_only=True
+    '/uploads/<filename>?', 'upload_file_without_age_and_background', build_only=True
 )
-app.add_url_rule(
-    "/uploads/<name>", endpoint="download_file", build_only=True
-)
+
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': app.config['UPLOAD_FOLDER']
 })
@@ -36,13 +34,13 @@ def allowed_file(filename):
 
 
 def build_url(filename, age, background):
-    if age and background != 'none':
+    if age != 'none' and background != 'none':
         return redirect(url_for('upload_file', filename=filename, age=age, background=background))
-    elif age and background != 'none':
+    elif age == 'none' and background != 'none':
         return redirect(url_for('upload_file_without_age', filename=filename, background=background))
-    elif not age and background == 'none':
+    elif age != 'none' and background == 'none':
         return redirect(url_for('upload_file_without_background', filename=filename, age=age))
-    elif not age and background == 'none':
+    elif age == 'none' and background == 'none':
         return redirect(url_for('upload_file_without_age_and_background', filename=filename))
 
 
@@ -78,7 +76,7 @@ def upload_file():
     return render_template('upload.html', ages=ages, backgrounds=backgrounds)
 
 
-@app.route('/uploads/<filename>', defaults={'age': None, 'background': None})
+@app.route('/uploads/<filename>?', defaults={'age': None, 'background': None})
 @app.route('/uploads/<filename>?age=<age>', defaults={'background': None})
 @app.route('/uploads/<filename>?background=<background>', defaults={'age': None})
 @app.route('/uploads/<filename>?age=<age>&background=<background>')
