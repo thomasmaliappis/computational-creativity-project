@@ -81,7 +81,7 @@ def upload_file():
 @app.route('/transform/<filename>?age=<age>', defaults={'background': None})
 @app.route('/transform/<filename>?background=<background>', defaults={'age': None})
 @app.route('/transform/<filename>?age=<age>&background=<background>')
-def uploaded_file(filename, age, background):
+def transformed_file(filename, age, background):
     # reading given image
     img_path = app.config['IMG_FOLDER'] + '/' + filename
     img = Image.open(img_path)
