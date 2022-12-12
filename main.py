@@ -1,30 +1,31 @@
 import os
+from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 
-UPLOAD_FOLDER = './images'
+IMG_FOLDER = './images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['IMG_FOLDER'] = IMG_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 app.add_url_rule(
-    '/uploads/<filename>?age=<age>&background=<background>', 'upload_file', build_only=True
+    '/transform/<filename>?age=<age>&background=<background>', 'transform_file', build_only=True
 )
 app.add_url_rule(
-    '/uploads/<filename>?age=<age>', 'upload_file_without_background', build_only=True
+    '/transform/<filename>?age=<age>', 'transform_file_without_background', build_only=True
 )
 app.add_url_rule(
-    '/uploads/<filename>?background=<background>', 'upload_file_without_age', build_only=True
+    '/transform/<filename>?background=<background>', 'transform_file_without_age', build_only=True
 )
 app.add_url_rule(
-    '/uploads/<filename>?', 'upload_file_without_age_and_background', build_only=True
+    '/transform/<filename>?', 'transform_file_without_age_and_background', build_only=True
 )
 
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-    '/uploads': app.config['UPLOAD_FOLDER']
+    '/transform': app.config['IMG_FOLDER']
 })
 
 
@@ -35,13 +36,13 @@ def allowed_file(filename):
 
 def build_url(filename, age, background):
     if age != 'none' and background != 'none':
-        return redirect(url_for('upload_file', filename=filename, age=age, background=background))
+        return redirect(url_for('transform_file', filename=filename, age=age, background=background))
     elif age == 'none' and background != 'none':
-        return redirect(url_for('upload_file_without_age', filename=filename, background=background))
+        return redirect(url_for('transform_file_without_age', filename=filename, background=background))
     elif age != 'none' and background == 'none':
-        return redirect(url_for('upload_file_without_background', filename=filename, age=age))
+        return redirect(url_for('transform_file_without_background', filename=filename, age=age))
     elif age == 'none' and background == 'none':
-        return redirect(url_for('upload_file_without_age_and_background', filename=filename))
+        return redirect(url_for('transform_file_without_age_and_background', filename=filename))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -59,7 +60,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['IMG_FOLDER'], filename))
             age = request.form['age']
             background = request.form['background']
             return build_url(filename, age, background)
@@ -76,18 +77,29 @@ def upload_file():
     return render_template('upload.html', ages=ages, backgrounds=backgrounds)
 
 
-@app.route('/uploads/<filename>?', defaults={'age': None, 'background': None})
-@app.route('/uploads/<filename>?age=<age>', defaults={'background': None})
-@app.route('/uploads/<filename>?background=<background>', defaults={'age': None})
-@app.route('/uploads/<filename>?age=<age>&background=<background>')
+@app.route('/transform/<filename>?', defaults={'age': None, 'background': None})
+@app.route('/transform/<filename>?age=<age>', defaults={'background': None})
+@app.route('/transform/<filename>?background=<background>', defaults={'age': None})
+@app.route('/transform/<filename>?age=<age>&background=<background>')
 def uploaded_file(filename, age, background):
+    # reading given image
+    img_path = app.config['IMG_FOLDER'] + '/' + filename
+    img = Image.open(img_path)
+
     # TODO
-    # if age is specified
-    # call model and transform original image according to age value
-    # if background
-    # is specified change background of image
-    # redirect to new image
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    #  replace with model function that generates transformed image
+    #  use age and background as input parameters
+    transformed_img = img
+
+    # saving transformed image
+    transformed_img_path = app.config['IMG_FOLDER'] + '/transformed' + filename
+    transformed_img.save(transformed_img_path)
+
+    # show transformed image
+    return send_from_directory(app.config['IMG_FOLDER'], 'transformed' + filename)
+    # TODO
+    #  create page to show transformed image
+    # return render_template('transformed.html', image=transformed_img_path)
 
 
 @app.route('/hello/')
