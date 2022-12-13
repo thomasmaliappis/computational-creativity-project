@@ -42,6 +42,9 @@ trans = transforms.Compose([
     transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
 
+change_bg = alter_bg()
+change_bg.load_pascalvoc_model("deeplabv3_xception_tf_dim_ordering_tf_kernels.h5")
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -104,11 +107,10 @@ def transformed_file(filename, age, background):
         # saving transformed image
         plt.imsave(transformed_img_path, transformed_img)
 
-    # if background is not None:
-    #     change_bg = alter_bg()
-    #     change_bg.load_pascalvoc_model("deeplabv3_xception_tf_dim_ordering_tf_kernels.h5")
-    #     output = change_bg.change_bg_img(f_image_path=transformed_img_path, b_image_path="background.jpg")
-    #     cv2.imwrite(transformed_img_path, output)
+    if background is not None:
+        output = change_bg.change_bg_img(f_image_path=transformed_img_path,
+                                         b_image_path="./static/orange-background.jpg",
+                                         output_image_name=transformed_img_path)
 
     # select title and image to show
     if age == 'no' and background is None:
