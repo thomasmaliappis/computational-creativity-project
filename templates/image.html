@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<head>
+    <title>Transformed Image</title>
+    <style>
+
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        .page {
+            /* The image used */
+            /* TODO change background image */
+            background-image: url('/static/orange-background.jpg');
+
+            /* Full height */
+            height: 100%;
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .title {
+            margin-top: 0;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .container {
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 10px;
+            max-width: 600px;
+            min-width: 512px;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        img {
+            border-radius: 10px;
+            height: 512px;
+            width: 512px;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    {% if title == 1 %}
+        <h1 class="title">This is the old picture</h1>
+    {% elif title == 2 %}
+        <h1 class="title">This is your changed background</h1>
+    {% else %}
+        <h1 class="title">This is your original picture</h1>
+    {% endif %}
+
+    <div class="container">
+        <img src="{{ img_path }}" alt="transformed image">
+    </div>
+</div>
+</body>

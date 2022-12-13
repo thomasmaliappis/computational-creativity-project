@@ -2,6 +2,12 @@
 <head>
     <title>Upload new Photo</title>
     <style>
+
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -12,6 +18,11 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: vertical;
+        }
+
+        input[type=radio] {
+            padding: 12px;
+            margin-top: 15px;
         }
 
         input[type=file] {
@@ -29,7 +40,7 @@
             background-color: #04AA6D;
             color: white;
             padding: 12px 20px;
-            margin: 5px 0 0 0;
+            margin: 10px 0 -10px 0;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -41,19 +52,24 @@
         }
 
         .title {
+            margin-top: 0;
+            padding-top: 20px;
             text-align: center;
         }
 
-        {#.page {#}
-        {#    display: flex;#}
-        {#    flex-direction: column;#}
-        {#    flex: auto;#}
-        {#}#}
+        .page {
+            /* TODO change background image */
+            background-image: url('/static/orange-background.jpg');
+            height: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
 
         .container {
             border-radius: 5px;
             background-color: #f2f2f2;
-            padding: 10px;
+            padding: 20px;
             max-width: 600px;
             margin: auto;
         }
@@ -94,18 +110,6 @@
         <form method=post enctype=multipart/form-data>
             <div class="row">
                 <div class="col-25">
-                    <label for="age">Target age:</label>
-                </div>
-                <div class="col-75">
-                    <select name="age" id="age">
-                        {% for a in ages %}
-                            <OPTION value={{ a.age_id }}>{{ a.age_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-25">
                     <label for="background">Background:</label>
                 </div>
                 <div class="col-75">
@@ -114,6 +118,15 @@
                             <OPTION value={{ b.background_id }}>{{ b.background_name }}</option>
                         {% endfor %}
                     </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="age">Change age:</label>
+                </div>
+                <div class="col-75">
+                    <input type="radio" id="age" name="age" value="yes" required> yes
+                    <input type="radio" id="age" name="age" value="no"> no
                 </div>
             </div>
             <div class="row">
