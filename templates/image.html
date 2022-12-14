@@ -48,13 +48,7 @@
 </head>
 <body>
 <div class="page">
-    {% if title == 1 %}
-        <h1 class="title">This is the old picture</h1>
-    {% elif title == 2 %}
-        <h1 class="title">This is your changed background</h1>
-    {% else %}
-        <h1 class="title">This is your original picture</h1>
-    {% endif %}
+        <h1 class="title">{{ title }}</h1>
 
     <div class="container">
         <img src="{{ img_path }}" alt="transformed image">

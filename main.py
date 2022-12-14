@@ -7,10 +7,12 @@ from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, render_template
 from pixellib.tune_bg import alter_bg
 from torchvision import transforms
+from torchvision.transforms.functional import to_tensor, to_pil_image
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import secure_filename
 
-from fast_aging_gan.gan_module import Generator
+from anime_gan.model import Generator as anime_Generator
+from fast_aging_gan.gan_module import Generator as age_Generator
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -28,16 +30,20 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/transform': app.config['IMG_FOLDER']
 })
 
-# image_path = os.path.join(args.image_dir, filename)
-model = Generator(ngf=32, n_residual_blocks=9)
-ckpt = torch.load('./fast_aging_gan/pretrained_model/state_dict.pth', map_location='cpu')
-model.load_state_dict(ckpt)
-model.eval()
+# age model
+age_model = age_Generator(ngf=32, n_residual_blocks=9)
+age_model.load_state_dict(torch.load('./fast_aging_gan/pretrained_model/state_dict.pth', map_location='cpu'))
+age_model.eval()
 trans = transforms.Compose([
     transforms.Resize((512, 512)),
     transforms.ToTensor(),
     transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
+
+# anime model
+anime_model = anime_Generator()
+anime_model.load_state_dict(torch.load('./anime_gan/weights/paprika.pt', map_location="cpu"))
+anime_model.eval()
 
 change_bg = alter_bg()
 change_bg.load_pascalvoc_model("deeplabv3_xception_tf_dim_ordering_tf_kernels.h5")
@@ -87,7 +93,7 @@ def transformed_file(filename, age, anime, sketch, background):
     if age:
         img = Image.open(img_path).convert('RGB')
         img = trans(img).unsqueeze(0)
-        transformed_img = model(img)
+        transformed_img = age_model(img)
         transformed_img = (transformed_img.squeeze().permute(1, 2, 0).numpy() + 1.0) / 2.0
 
         # saving transformed image
@@ -107,6 +113,15 @@ def transformed_file(filename, age, anime, sketch, background):
     if anime:
         filename = 'anime_' + filename
         anime_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
+        img = Image.open(img_path).convert("RGB")
+        with torch.no_grad():
+            image = to_tensor(img).unsqueeze(0) * 2 - 1
+            out = anime_model(image.to('cpu'), False).cpu()
+            out = out.squeeze(0).clip(-1, 1) * 0.5 + 0.5
+            out = to_pil_image(out)
+
+        out.save(anime_img_path)
+        img_path = anime_img_path
 
     if sketch:
         img = cv2.imread(img_path)  # loads an image from the specified file
@@ -124,11 +139,7 @@ def transformed_file(filename, age, anime, sketch, background):
 
     img_path = '/' + img_path
     # TODO Change titles
-    # select title and image to show
-    if not age and background is None:
-        title = 0
-    else:
-        title = 1 if age else 2
+    title = 'Temp title'
     return render_template('image.html', title=title, img_path=img_path)
 
 
