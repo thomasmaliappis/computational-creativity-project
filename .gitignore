@@ -1,5 +1,4 @@
 .idea
 venv
 images
-SAM
 deeplabv3_xception_tf_dim_ordering_tf_kernels.h5
