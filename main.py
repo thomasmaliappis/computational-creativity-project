@@ -1,30 +1,27 @@
 import os
 
+import cv2
 import matplotlib.pyplot as plt
 import torch
 from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, render_template
+from pixellib.tune_bg import alter_bg
 from torchvision import transforms
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import secure_filename
 
 from fast_aging_gan.gan_module import Generator
 
-import pixellib
-from pixellib.tune_bg import alter_bg
-import cv2
-
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 app.config['IMG_FOLDER'] = os.path.join('static', 'images')
+app.config['BG_FOLDER'] = os.path.join('static', 'backgrounds')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 app.add_url_rule(
-    '/transform/<filename>?age=<age>&background=<background>', 'transform_file', build_only=True
-)
-app.add_url_rule(
-    '/transform/<filename>?age=<age>', 'transform_file_without_background', build_only=True
+    '/transform/<filename>?age=<age>&anime=<anime>&sketch=<sketch>&background=<background>', 'transform_file',
+    build_only=True
 )
 
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
@@ -37,7 +34,7 @@ ckpt = torch.load('./fast_aging_gan/pretrained_model/state_dict.pth', map_locati
 model.load_state_dict(ckpt)
 model.eval()
 trans = transforms.Compose([
-    transforms.Resize((1024, 1024)),
+    transforms.Resize((512, 512)),
     transforms.ToTensor(),
     transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 ])
@@ -49,13 +46,6 @@ change_bg.load_pascalvoc_model("deeplabv3_xception_tf_dim_ordering_tf_kernels.h5
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def build_url(filename, age, background):
-    if background != 'none':
-        return redirect(url_for('transform_file', filename=filename, age=age, background=background))
-    else:
-        return redirect(url_for('transform_file_without_background', filename=filename, age=age))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -74,51 +64,71 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['IMG_FOLDER'], filename))
-            age = request.form['age']
             background = request.form['background']
-            return build_url(filename, age, background)
-    backgrounds = [
-        {'background_name': 'none', 'background_id': 'none'},
-        {'background_name': 'name1', 'background_id': 'id1'},
-        {'background_name': 'name2', 'background_id': 'id2'}
-    ]
+            return redirect(
+                url_for('transform_file',
+                        filename=filename, age=request.form['age'], anime=request.form['anime'],
+                        sketch=request.form['sketch'], background=background))
+    backgrounds = [{'background_name': 'none', 'background_id': 'none'}] + [
+        {'background_name': file.replace('.jpg', ''), 'background_id': file.replace('.jpg', '')} for file in
+        os.listdir('./static/backgrounds')]
     return render_template('upload.html', backgrounds=backgrounds)
 
 
-@app.route('/transform/<filename>?', defaults={'age': None, 'background': None})
-@app.route('/transform/<filename>?age=<age>', defaults={'background': None})
-@app.route('/transform/<filename>?background=<background>', defaults={'age': None})
-@app.route('/transform/<filename>?age=<age>&background=<background>')
+@app.route('/transform/<filename>?age=<age>&anime=<anime>&sketch=<sketch>&background=<background>')
 @torch.no_grad()
-def transformed_file(filename, age, background):
+def transformed_file(filename, age, anime, sketch, background):
     # reading given image
     img_path = os.path.join(app.config['IMG_FOLDER'], filename)
-    img = Image.open(img_path).convert('RGB')
+    age = True if age == 'yes' else False
+    anime = True if anime == 'yes' else False
+    sketch = True if sketch == 'yes' else False
 
-    transformed_img_path = os.path.join(app.config['IMG_FOLDER'], 'transformed' + filename)
-    # TODO
-    #  replace with model function that generates transformed image
-    #  use age and background as input parameters
-    if age == 'yes':
+    if age:
+        img = Image.open(img_path).convert('RGB')
         img = trans(img).unsqueeze(0)
         transformed_img = model(img)
         transformed_img = (transformed_img.squeeze().permute(1, 2, 0).numpy() + 1.0) / 2.0
 
         # saving transformed image
-        plt.imsave(transformed_img_path, transformed_img)
+        filename = 'age_' + filename
+        aged_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
+        plt.imsave(aged_img_path, transformed_img)
+        img_path = aged_img_path
 
-    if background is not None:
-        output = change_bg.change_bg_img(f_image_path=transformed_img_path,
-                                         b_image_path="./static/orange-background.jpg",
-                                         output_image_name=transformed_img_path)
+    if background != 'none':
+        background_path = os.path.join(app.config['BG_FOLDER'], background + '.jpg')
+        filename = 'bg_' + filename
+        changed_bg_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
+        change_bg.change_bg_img(f_image_path=img_path, b_image_path=background_path,
+                                output_image_name=changed_bg_img_path)
+        img_path = changed_bg_img_path
+    # TODO check anime transformation
+    if anime:
+        filename = 'anime_' + filename
+        anime_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
 
+    if sketch:
+        img = cv2.imread(img_path)  # loads an image from the specified file
+        # convert an image from one color space to another
+        grey_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        invert = cv2.bitwise_not(grey_img)  # helps in masking of the image
+        # sharp edges in images are smoothed while minimizing too much blurring
+        blur = cv2.GaussianBlur(invert, (21, 21), 0)
+        invertedblur = cv2.bitwise_not(blur)
+        sketch = cv2.divide(grey_img, invertedblur, scale=256.0)
+        filename = 'sketch_' + filename
+        sketched_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
+        cv2.imwrite(sketched_img_path, sketch)  # converted image is saved as mentioned name
+        img_path = sketched_img_path
+
+    img_path = '/' + img_path
+    # TODO Change titles
     # select title and image to show
-    if age == 'no' and background is None:
+    if not age and background is None:
         title = 0
-        img_path = '/' + img_path
     else:
-        img_path = '/' + transformed_img_path
-        title = 1 if age == 'yes' else 2
+        title = 1 if age else 2
     return render_template('image.html', title=title, img_path=img_path)
 
 

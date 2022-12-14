@@ -37,7 +37,7 @@
         }
 
         input[type=submit] {
-            background-color: #04AA6D;
+            background-color: #66ccbe;
             color: white;
             padding: 12px 20px;
             margin: 10px 0 -10px 0;
@@ -52,14 +52,16 @@
         }
 
         .title {
+            color: #322d2c;
             margin-top: 0;
-            padding-top: 20px;
+            padding-top: 150px;
+            padding-bottom: 50px;
             text-align: center;
         }
 
         .page {
             /* TODO change background image */
-            background-image: url('/static/orange-background.jpg');
+            background-image: url('/static/pencil-sketch-texture.jpg');
             height: 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -67,6 +69,7 @@
         }
 
         .container {
+            border: 2px solid #322d2c;
             border-radius: 5px;
             background-color: #f2f2f2;
             padding: 20px;
@@ -127,6 +130,24 @@
                 <div class="col-75">
                     <input type="radio" id="age" name="age" value="yes" required> yes
                     <input type="radio" id="age" name="age" value="no"> no
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="anime">Anime:</label>
+                </div>
+                <div class="col-75">
+                    <input type="radio" id="anime" name="anime" value="yes" required> yes
+                    <input type="radio" id="anime" name="anime" value="no"> no
+                </div>
+            </div>
+        <div class="row">
+                <div class="col-25">
+                    <label for="sketch">Sketch:</label>
+                </div>
+                <div class="col-75">
+                    <input type="radio" id="sketch" name="sketch" value="yes" required> yes
+                    <input type="radio" id="sketch" name="sketch" value="no"> no
                 </div>
             </div>
             <div class="row">
