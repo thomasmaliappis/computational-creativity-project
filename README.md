@@ -1,4 +1,11 @@
-# Computational Creativity Project
+# Installation Instructions and Requirements
+
+- clone this repository
+- install python 3.7
+- install requirements from requirements.txt using the following command
+  - pip install -r requirements.txt
+
+# Description
 
 ## Age GAN model
 
