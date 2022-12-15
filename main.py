@@ -109,13 +109,13 @@ def transformed_file(filename, age, anime, sketch, background):
         change_bg.change_bg_img(f_image_path=img_path, b_image_path=background_path,
                                 output_image_name=changed_bg_img_path)
         img_path = changed_bg_img_path
-    # TODO check anime transformation
+
     if anime:
         filename = 'anime_' + filename
         anime_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
         img = Image.open(img_path).convert("RGB")
         with torch.no_grad():
-            image = to_tensor(img).unsqueeze(0) * 2 - 1
+            image = trans(img).unsqueeze(0) * 2 - 1
             out = anime_model(image.to('cpu'), False).cpu()
             out = out.squeeze(0).clip(-1, 1) * 0.5 + 0.5
             out = to_pil_image(out)
