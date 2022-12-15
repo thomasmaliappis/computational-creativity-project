@@ -7,7 +7,7 @@ from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, render_template
 from pixellib.tune_bg import alter_bg
 from torchvision import transforms
-from torchvision.transforms.functional import to_tensor, to_pil_image
+from torchvision.transforms.functional import to_pil_image
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import secure_filename
 
@@ -139,7 +139,7 @@ def transformed_file(filename, age, anime, sketch, background):
 
     img_path = '/' + img_path
     # TODO Change titles
-    title = 'Temp title'
+    title = 'Result'
     return render_template('image.html', title=title, img_path=img_path)
 
 
