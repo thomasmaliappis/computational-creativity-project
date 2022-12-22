@@ -1,4 +1,8 @@
-# Installation Instructions and Requirements
+# Introduction
+This is a web application developed with python and [Flask](https://flask.palletsprojects.com/en/2.2.x/).
+It is an interface to allow a user to create images by uploading a face image and applying various filters.
+
+# Installation
 
 - clone this repository.
 - install python 3.7.
