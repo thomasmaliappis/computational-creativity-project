@@ -35,6 +35,11 @@ After uploading the image you are sent to another view where your produced image
 For the age transformation we used [Fast-AgingGAN](https://github.com/HasnainRaz/Fast-AgingGAN) model.
 This is a face aging deep learning model based on the CycleGAN, where they translate young faces to old.
 
+**Example**
+
+<img src="./static/examples/Liam_Hemsworth.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/age_Liam_Hemsworth.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
 ## Change background model
 
 This feature is based on *pixellib* package. Using the following lines of code it understands the background of *sample.jpg* and changes it with the given *background.jpg*.  
@@ -60,14 +65,40 @@ This feature is based on *pixellib* package. Using the following lines of code i
 - Add more backgrounds
 You can add more background by adding an image file in the static/backgrounds folder. If the image name is *background_name.jpeg* then you would be able to select it in the background drop down list with the name *background_name*
 
+**Example**
+
+<img src="./static/examples/Jim_Parsons.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/bg_Jim_Parsons.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
 ## Anime GAN model
 
 For the anime transformation we used [AnimeGan2](https://github.com/bryandlee/animegan2-pytorch) model.
 This model given a face image produces an anime image of the face.
 
+**Example**
+
+<img src="./static/examples/Renée_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
 ## Sketch
 
 Following the steps from this [tutorial](https://www.geeksforgeeks.org/convert-image-into-sketch/), we get the outlines of the images that can be used if someone wants to sketch a portrait.  
+
+**Example**
+
+<img src="./static/examples/Courteney_Cox.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/sketch_Courteney_Cox.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
+## Combination
+The features can also be combined. When more than one feature is chosen the server produces more than image.
+
+**Example**
+
+<img src="./static/examples/Matthew_McConaughey.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/age_Matthew_McConaughey.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/bg_age_Matthew_McConaughey.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/anime_bg_age_Matthew_McConaughey.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+<img src="./static/examples/sketch_anime_bg_age_Matthew_McConaughey.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
 
 # Future work
 - show the background images in the dropdown list of the upload view.
