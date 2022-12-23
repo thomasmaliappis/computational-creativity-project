@@ -83,12 +83,15 @@ def upload_file():
 
 @app.route('/transform/<filename>?age=<age>&anime=<anime>&sketch=<sketch>&background=<background>')
 @torch.no_grad()
-def transformed_file(filename, age, anime, sketch, background):
+def transformed_file(filename, age, anime, sketch, background, resize=True):
     # reading given image
     img_path = os.path.join(app.config['IMG_FOLDER'], filename)
     age = True if age == 'yes' else False
     anime = True if anime == 'yes' else False
     sketch = True if sketch == 'yes' else False
+
+    img = Image.open(img_path).convert('RGB')
+    original_size = img.size
 
     if age:
         img = Image.open(img_path).convert('RGB')
@@ -101,6 +104,10 @@ def transformed_file(filename, age, anime, sketch, background):
         aged_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
         plt.imsave(aged_img_path, transformed_img)
         img_path = aged_img_path
+        if resize:
+            img = Image.open(img_path).convert('RGB')
+            img = img.resize(original_size)
+            img.save(img_path)
 
     if background != 'none':
         background_path = os.path.join(app.config['BG_FOLDER'], background + '.jpg')
@@ -109,6 +116,10 @@ def transformed_file(filename, age, anime, sketch, background):
         change_bg.change_bg_img(f_image_path=img_path, b_image_path=background_path,
                                 output_image_name=changed_bg_img_path)
         img_path = changed_bg_img_path
+        if resize:
+            img = Image.open(img_path).convert('RGB')
+            img = img.resize(original_size)
+            img.save(img_path)
 
     if anime:
         filename = 'anime_' + filename
@@ -122,6 +133,10 @@ def transformed_file(filename, age, anime, sketch, background):
 
         out.save(anime_img_path)
         img_path = anime_img_path
+        if resize:
+            img = Image.open(img_path).convert('RGB')
+            img = img.resize(original_size)
+            img.save(img_path)
 
     if sketch:
         img = cv2.imread(img_path)  # loads an image from the specified file
@@ -136,11 +151,13 @@ def transformed_file(filename, age, anime, sketch, background):
         sketched_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
         cv2.imwrite(sketched_img_path, sketch)  # converted image is saved as mentioned name
         img_path = sketched_img_path
+        if resize:
+            img = Image.open(img_path).convert('RGB')
+            img = img.resize(original_size)
+            img.save(img_path)
 
     img_path = '/' + img_path
-    # TODO Change titles
-    title = 'Result'
-    return render_template('image.html', title=title, img_path=img_path)
+    return render_template('image.html', title='Result', img_path=img_path)
 
 
 if __name__ == '__main__':
