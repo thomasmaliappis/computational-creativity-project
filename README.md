@@ -31,6 +31,8 @@ After uploading the image you are sent to another view where your produced image
 
 # Description
 
+The images used for experimentation and the examples below were taken from [CACD2000](https://bcsiriuschen.github.io/CARC/) dataset.
+
 ## Age GAN model
 For the age transformation we used [Fast-AgingGAN](https://github.com/HasnainRaz/Fast-AgingGAN) model.
 This is a face aging deep learning model based on the CycleGAN, where they translate young faces to old.
