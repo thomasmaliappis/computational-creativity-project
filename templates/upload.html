@@ -124,6 +124,18 @@
             </div>
             <div class="row">
                 <div class="col-25">
+                    <label for="anime">Anime:</label>
+                </div>
+                <div class="col-75">
+                    <select name="anime" id="anime">
+                        {% for a in anime_styles %}
+                            <OPTION value={{ a.anime_id }}>{{ a.anime_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
                     <label for="age">Change age:</label>
                 </div>
                 <div class="col-75">
@@ -132,15 +144,6 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-25">
-                    <label for="anime">Anime:</label>
-                </div>
-                <div class="col-75">
-                    <input type="radio" id="anime" name="anime" value="yes" required> yes
-                    <input type="radio" id="anime" name="anime" value="no"> no
-                </div>
-            </div>
-        <div class="row">
                 <div class="col-25">
                     <label for="sketch">Sketch:</label>
                 </div>

@@ -18,7 +18,7 @@ You can start the flask app by running the following command in your terminal
 
 Now open your browser at [http://127.0.0.1:8080](http://127.0.0.1:8080) and you will be able to see the following view
 
-<img src="./templates/upload_view.png" alt="upload view image" style="height: 600px; width:700px;"/>
+<img src="./templates/upload_view.png" alt="upload view image" style="height: 700px; width:900px;"/>
 
 You have to choose a square image containing a face that is going to be transformed(input image).
 After selecting the image to be transformed you can choose from four features to be applied to your image.
@@ -32,6 +32,9 @@ After uploading the image you are sent to another view where your produced image
 # Description
 
 The images used for experimentation and the examples below were taken from [CACD2000](https://bcsiriuschen.github.io/CARC/) dataset.
+
+[//]: # (TODO add gif)
+[//]: # (![Alt Text]&#40;&#41;)
 
 ## Age GAN model
 For the age transformation we used [Fast-AgingGAN](https://github.com/HasnainRaz/Fast-AgingGAN) model.
@@ -77,10 +80,30 @@ You can add more background by adding an image file in the static/backgrounds fo
 For the anime transformation we used [AnimeGan2](https://github.com/bryandlee/animegan2-pytorch) model.
 This model given a face image produces an anime image of the face.
 
+There are 4 pretrained versions of the model that can be seen below.
+
 **Example**
 
+- original
+
 <img src="./static/examples/Renée_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
-<img src="./static/examples/anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
+- paprika
+
+<img src="./static/examples/paprika_anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
+- face paint v1
+
+<img src="./static/examples/face_paint_v1_anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
+- face paint v2
+
+<img src="./static/examples/face_paint_v2_anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
+- celeba distill
+
+<img src="./static/examples/celeba_anime_Renee_Zellweger.jpg" alt="upload view image" style="height: 250px; width:250px;"/>
+
 
 ## Sketch
 

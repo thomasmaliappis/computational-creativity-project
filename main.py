@@ -41,9 +41,18 @@ trans = transforms.Compose([
 ])
 
 # anime model
-anime_model = anime_Generator()
-anime_model.load_state_dict(torch.load('./anime_gan/weights/paprika.pt', map_location="cpu"))
-anime_model.eval()
+paprika_anime_model = anime_Generator()
+paprika_anime_model.load_state_dict(torch.load('./anime_gan/weights/paprika.pt', map_location="cpu"))
+paprika_anime_model.eval()
+face_paint_v1_anime_model = anime_Generator()
+face_paint_v1_anime_model.load_state_dict(torch.load('./anime_gan/weights/face_paint_v1.pt', map_location="cpu"))
+face_paint_v1_anime_model.eval()
+face_paint_v2_anime_model = anime_Generator()
+face_paint_v2_anime_model.load_state_dict(torch.load('./anime_gan/weights/face_paint_v2.pt', map_location="cpu"))
+face_paint_v2_anime_model.eval()
+celeba_anime_model = anime_Generator()
+celeba_anime_model.load_state_dict(torch.load('./anime_gan/weights/celeba_distill.pt', map_location="cpu"))
+celeba_anime_model.eval()
 
 change_bg = alter_bg()
 change_bg.load_pascalvoc_model("deeplabv3_xception_tf_dim_ordering_tf_kernels.h5")
@@ -76,9 +85,13 @@ def upload_file():
                         filename=filename, age=request.form['age'], anime=request.form['anime'],
                         sketch=request.form['sketch'], background=background))
     backgrounds = [{'background_name': 'none', 'background_id': 'none'}] + [
-        {'background_name': file.replace('.jpg', ''), 'background_id': file.replace('.jpg', '')} for file in
-        os.listdir('./static/backgrounds')]
-    return render_template('upload.html', backgrounds=backgrounds)
+        {'background_name': file.replace('.jpg', ''), 'background_id': file.replace('.jpg', '')}
+        for file in os.listdir('./static/backgrounds')]
+
+    anime_styles = [{'anime_name': 'none', 'anime_id': 'none'}] + [
+        {'anime_name': file.replace('.pt', '').replace('_', ' '), 'anime_id': file.replace('.pt', '')}
+        for file in os.listdir('./anime_gan/weights')]
+    return render_template('upload.html', backgrounds=backgrounds, anime_styles=anime_styles)
 
 
 @app.route('/transform/<filename>?age=<age>&anime=<anime>&sketch=<sketch>&background=<background>')
@@ -87,7 +100,6 @@ def transformed_file(filename, age, anime, sketch, background, resize=True):
     # reading given image
     img_path = os.path.join(app.config['IMG_FOLDER'], filename)
     age = True if age == 'yes' else False
-    anime = True if anime == 'yes' else False
     sketch = True if sketch == 'yes' else False
 
     img = Image.open(img_path).convert('RGB')
@@ -121,8 +133,20 @@ def transformed_file(filename, age, anime, sketch, background, resize=True):
             img = img.resize(original_size)
             img.save(img_path)
 
-    if anime:
-        filename = 'anime_' + filename
+    if anime != 'none':
+        if anime == 'paprika':
+            anime_model = paprika_anime_model
+            filename = 'paprika_anime_' + filename
+        elif anime == 'face_paint_v1':
+            anime_model = face_paint_v1_anime_model
+            filename = 'face_paint_v1_anime_' + filename
+        elif anime == 'face_paint_v2':
+            anime_model = face_paint_v2_anime_model
+            filename = 'face_paint_v2_anime_' + filename
+        elif anime == 'celeba_distill':
+            anime_model = celeba_anime_model
+            filename = 'celeba_anime_' + filename
+        # filename = 'anime_' + filename
         anime_img_path = os.path.join(app.config['IMG_FOLDER'], filename)
         img = Image.open(img_path).convert("RGB")
         with torch.no_grad():
