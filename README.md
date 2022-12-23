@@ -18,7 +18,7 @@ You can start the flask app by running the following command in your terminal
 
 Now open your browser at [http://127.0.0.1:8080](http://127.0.0.1:8080) and you will be able to see the following view
 
-<img src="./templates/upload_view.png" alt="upload view image" style="height: 700px; width:900px;"/>
+![usage example](./static/example.gif)
 
 You have to choose a square image containing a face that is going to be transformed(input image).
 After selecting the image to be transformed you can choose from four features to be applied to your image.
@@ -32,9 +32,6 @@ After uploading the image you are sent to another view where your produced image
 # Description
 
 The images used for experimentation and the examples below were taken from [CACD2000](https://bcsiriuschen.github.io/CARC/) dataset.
-
-[//]: # (TODO add gif)
-[//]: # (![Alt Text]&#40;&#41;)
 
 ## Age GAN model
 For the age transformation we used [Fast-AgingGAN](https://github.com/HasnainRaz/Fast-AgingGAN) model.
